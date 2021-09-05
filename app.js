@@ -1,3 +1,33 @@
+const fromCurrencyInput = document.querySelector(".from-currency");
+const toCurrencyInput = document.querySelector(".to-currency");
+const exchangeAmountInput = document.querySelector(".amount");
+const getRateBtn = document.querySelector(".get-rate");
+
+getRateBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  const fromCurrencyValue = fromCurrencyInput.value;
+  const toCurrencyValue = toCurrencyInput.value;
+  const exchangeAmountValue = exchangeAmountInput.value;
+
+  if (
+    fromCurrencyValue === "" ||
+    toCurrencyValue === "" ||
+    exchangeAmountValue === ""
+  ) {
+    inputError();
+  } else {
+    convertCurrency(fromCurrencyValue, toCurrencyValue, exchangeAmountValue)
+      .then((exchangeResult) => {
+        document.querySelector(".currency-item").innerText = exchangeResult;
+
+        setTimeout(() => {
+          location.reload();
+        }, 6000);
+      })
+      .catch(() => invalidCode());
+  }
+});
+
 //..................................................................................
 async function getExchangeRate(fromCurrency, toCurrency) {
   const response = await fetch(
@@ -10,7 +40,7 @@ async function getExchangeRate(fromCurrency, toCurrency) {
   const exchangeRate = baseCurrency * currencyRates[toCurrency];
 
   if (isNaN(exchangeRate)) {
-    console.log("Error");
+    throw new Error(invalidCode());
   }
   return exchangeRate;
 }
@@ -24,7 +54,3 @@ async function convertCurrency(fromCurrency, toCurrency, exchangeAmount) {
 
   return `${exchangeAmount} ${fromCurrency} ====> ${convertedAmount} ${toCurrency}`;
 }
-
-convertCurrency("AFN", "USD", 1000).then((exchangeResult) =>
-  console.log(exchangeResult)
-);
